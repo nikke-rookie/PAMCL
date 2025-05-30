@@ -1,0 +1,67 @@
+training.set: # 训练集路径
+test.set:  # 测试/验证集路径
+
+image_modal:
+  fusion: True
+  dim: 512  # 图像模态原始嵌入维度
+  image_set: # .safetensors 文件路径(绝对路径)
+  pre_trained:
+    enable: False  # 是否加载预训练权重
+    save: False  # 是否保存投影层 (enable=False 生效)
+    save_path: pth
+    image_pth:
+
+text_modal:
+  fusion: True
+  dim: 1024
+  item_text:
+  pre_trained:
+    enable: False
+    save: False
+    save_path: pth
+    item_text_pth:
+
+user_pref:
+  fusion: True
+  dim: 1024
+  pref_embs:
+  pre_trained:
+    enable: False
+    save: False
+    save_path: pth
+    user_pref_pth:
+
+
+llm:
+  augment: False
+  model: qwen2.5:0.5b
+  host: http://127.0.0.1:11434
+        # node09: http://172.16.110.34:45665
+  num_gpu: 2
+  num_thread: 48
+  prompt: ./conf/aug_prompt.txt
+  save: ./mk_dataset/ifashion_text_aug.json
+
+model:
+  name: PAMCL
+
+item.ranking.topN: [20]
+embedding.size: 64
+max.epoch: 500
+batch.size: 2048
+learning.rate: 1e-3
+reg.lambda: 1e-5
+
+PAMCL:
+  n_layer: 3
+  n_negs: 15
+  cl_layer: 1
+  lambda: 0.1
+  eta: 0.2
+  tau: 0.2
+
+gpu_id: 0
+persist: False
+seed: 2233
+
+output: results
