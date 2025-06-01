@@ -2,13 +2,8 @@ __pycache__
 results/
 log/
 pth/
-dataset/
-dataset2/
-mk_dataset/
+datasets/
 notebook/
-model/
-model/clip-vit-base-patch32
-model/stella_en_1.5B_v5
 bak/
 .vscode/
 
