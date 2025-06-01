@@ -43,7 +43,7 @@ class GraphRecommender(Recommender):
     def predict(self, u):
         raise NotImplementedError
 
-    def test(self):
+    def test(self, pre_trained=False, file: str = ""):
         def process_bar(num, total):
             rate = float(num) / total
             ratenum = int(50 * rate)
@@ -52,7 +52,7 @@ class GraphRecommender(Recommender):
         rec_list = {}
         user_count = len(self.data.test_set)
         for i, user in enumerate(self.data.test_set):
-            candidates = self.predict(user)
+            candidates = self.predict(user, pre_trained=pre_trained, file=file)
             rated_list, _ = self.data.user_rated(user)
             # 根据用户历史评分，排除已评分项目(赋极小值)
             for item in rated_list:
@@ -66,7 +66,7 @@ class GraphRecommender(Recommender):
         print('')
         return rec_list
 
-    def evaluate(self, rec_list):
+    def evaluate(self, rec_list, pre_trained=False):
         #* 仅在所有训练epoch结束后执行一次
         """
         输出推荐指标及结果
@@ -84,29 +84,31 @@ class GraphRecommender(Recommender):
             )
             line += '\n'
             self.recOutput.append(line)
+        
         current_time = strftime("%Y-%m-%d %H-%M-%S", localtime(time()))
         out_dir = self.output
-        top_items_file = f"{self.config['model']['name']}@{current_time}-top-{self.max_N}items.txt"
-        FileIO.write_file(out_dir, top_items_file, self.recOutput)
-        self.model_log.add(f"Top {self.max_N} items have been output to \"{abspath(out_dir)}/{top_items_file}\"")
 
-        # 输出评估指标到文件
+        top_items_file = f"{self.config['model']['name']}@{current_time}-top-{self.max_N}items.txt"
         performance_file = f"{self.config['model']['name']}@{current_time}-performance.txt"
+
         self.result = ranking_evaluation(self.data.test_set, rec_list, self.topN)
-        # 日志输出评估指标
-        self.model_log.add('###Evaluation Results###')
-        result_format_str = '\n'
-        for r in self.result:
-            result_format_str += r
-        self.model_log.add(result_format_str)
-        FileIO.write_file(out_dir, performance_file, self.result)
-        self.model_log.add(f"Performance result has been output to \"{abspath(out_dir)}/{performance_file}\"")
+        # self.model_log.add('###Evaluation Results###')
+        # result_format_str = '\n'
+        # for r in self.result:
+        #     result_format_str += r
+        # self.model_log.add(result_format_str)
+        self.model_log.add(f"The result of {self.model_name}: {''.join(self.result)}")
 
         end_time = time()
         train_time = end_time - self.start_time
-        # CLI 输出评估指标
-        self.model_log.add(f"The result of {self.model_name}: {''.join(self.result)}")
         self.model_log.add(f"Run time: {train_time:.2f}s")
+
+        if not pre_trained:
+            FileIO.write_file(out_dir, top_items_file, self.recOutput)
+            self.model_log.add(f"Top {self.max_N} items have been output to \"{abspath(out_dir)}/{top_items_file}\"")
+            FileIO.write_file(out_dir, performance_file, self.result)
+            self.model_log.add(f"Performance result has been output to \"{abspath(out_dir)}/{performance_file}\"")
+
         # bot.send_text(f'[whr] The result of {self.model_name}:\n{"".join(self.result)}\nRun time: {train_time:.2f}s')
 
     def fast_evaluation(self, epoch):

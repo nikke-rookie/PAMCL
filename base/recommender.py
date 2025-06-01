@@ -58,7 +58,7 @@ class Recommender:
     def predict(self, u):
         raise NotImplementedError
 
-    def test(self):
+    def test(self, pre_trained=False, file: str = ""):
         raise NotImplementedError
 
     def save(self):
@@ -79,17 +79,24 @@ class Recommender:
         print('Initializing and building model...')
         self.build()
 
-        print('=' * 80)
-        print('Training Model...')
-        self.train()
+        try:
+            print('=' * 80)
+            print('Training Model...')
+            self.train()
 
-        print('=' * 80)
-        print('Testing...')
-        rec_list = self.test()
+            print('=' * 80)
+            print('Testing...')
+            rec_list = self.test()
 
-        print('=' * 80)
-        print('Evaluating...')
-        self.evaluate(rec_list)
-
-        if self.is_persist:
-            self.persist()
+            print('=' * 80)
+            print('Evaluating...')
+            self.evaluate(rec_list)
+        except KeyboardInterrupt:
+            print("🈲 Stop by User Keyboard!")
+        finally:
+            if self.is_persist:
+                self.persist()
+    
+    def eval(self):
+        rec_list = self.test(pre_trained=True, file=self.config['model']['embs'])
+        self.evaluate(rec_list, pre_trained=True)

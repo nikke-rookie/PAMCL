@@ -13,7 +13,7 @@ from tqdm import tqdm
 import time
 import os
 from safetensors import safe_open
-from safetensors.torch import save_file
+from safetensors.torch import save_file, load_file
 from typing import Optional, Literal
 from dataclasses import dataclass
 
@@ -153,15 +153,20 @@ class PAMCL(GraphRecommender):
         self.best_user_emb, self.best_item_emb = self.user_emb, self.item_emb
 
     def persist(self):
-        user_embs = self.best_user_emb.cpu().numpy()
-        item_embs = self.best_item_emb.cpu().numpy()
+        user_embs = self.best_user_emb
+        item_embs = self.best_item_emb
         embs = {'user': user_embs, 'item': item_embs}
         save_name = f"{self.config['model']['name']}_{self.timestamp}.safetensors"
         save_file(embs, save_name)
 
-    def predict(self, u):
+    def predict(self, u, pre_trained=False, file: str = ""):
         user_id = self.data.get_user_id(u)
-        score = torch.matmul(self.user_emb[user_id], self.item_emb.transpose(0, 1))
+        if pre_trained:
+            assert os.path.exists(file), "Pre-trained model file does not exist."
+            trained_embs = load_file(file)
+            score = torch.matmul(trained_embs['user'][user_id], trained_embs['item'].transpose(0, 1))
+        else:
+            score = torch.matmul(self.user_emb[user_id], self.item_emb.transpose(0, 1))
         return score.cpu().numpy()
 
 

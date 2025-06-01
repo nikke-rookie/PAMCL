@@ -25,8 +25,11 @@ class SELFRec(object):
         if config.contain('user_pref') and config['user_pref']['fusion']:
             self.kwargs['user_pref'] = config['user_pref']
 
-    def execute(self):
+    def execute(self, is_eval=False):
         import_str = f"from {self.config['model']['name']} import {self.config['model']['name']}"
         exec(import_str)
         recommender = f"{self.config['model']['name']}(self.config,self.training_data,self.test_data,**self.kwargs)"
-        eval(recommender).execute()
+        if is_eval:
+            eval(recommender).eval()
+        else:
+            eval(recommender).execute()

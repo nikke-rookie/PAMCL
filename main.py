@@ -27,7 +27,10 @@ if __name__ == '__main__':
     else:
         conf = ModelConf(f'./conf/yelp.yaml')
     seed_it(conf['seed'])
-
+    
     rec = SELFRec(conf)
-    rec.execute()
+    if conf['model']['eval'] == True:
+        rec.execute(is_eval=True)
+    else:
+        rec.execute()
 
