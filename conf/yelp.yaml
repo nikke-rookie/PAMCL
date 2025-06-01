@@ -1,10 +1,10 @@
-training.set: # 训练集路径
-test.set: # 测试/验证集路径
+training.set: datasets/yelp/train.txt
+test.set: datasets/yelp/test.txt
 
 image_modal:
   fusion: True
   dim: 512  # 图像模态原始嵌入维度
-  image_set: # .safetensors 文件路径(绝对路径)
+  image_set: datasets/yelp/item_image_emb.safetensors
   pre_trained:
     enable: False  # 是否加载预训练权重
     save: False  # 是否保存投影层 (enable=False 生效)
@@ -14,7 +14,7 @@ image_modal:
 text_modal:
   fusion: True
   dim: 1024  # 文本模态原始嵌入维度
-  item_text:
+  item_text: datasets/yelp/item_text_embs.safetensors
   pre_trained:
     enable: False
     save: False
@@ -24,7 +24,7 @@ text_modal:
 user_pref:
   fusion: True
   dim: 1024
-  pref_embs:
+  pref_embs: datasets/yelp/user_pre_embs.safetensors
   pre_trained:
     enable: False
     save: False
@@ -44,6 +44,8 @@ llm:
 
 model:
   name: PAMCL
+  eval: False
+  embs: /home/yzh/PAMCL/PAMCL_2025-05-31 16-15-17.safetensors
 
 item.ranking.topN: [20]
 embedding.size: 64
@@ -60,8 +62,8 @@ PAMCL:
   eta: 0.2
   tau: 0.2
 
-gpu_id: 1
-persist: True
+gpu_id: 0
+persist: False
 seed: 666
 
 output: results

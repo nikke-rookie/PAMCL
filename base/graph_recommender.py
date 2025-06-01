@@ -92,11 +92,6 @@ class GraphRecommender(Recommender):
         performance_file = f"{self.config['model']['name']}@{current_time}-performance.txt"
 
         self.result = ranking_evaluation(self.data.test_set, rec_list, self.topN)
-        # self.model_log.add('###Evaluation Results###')
-        # result_format_str = '\n'
-        # for r in self.result:
-        #     result_format_str += r
-        # self.model_log.add(result_format_str)
         self.model_log.add(f"The result of {self.model_name}: {''.join(self.result)}")
 
         end_time = time()
