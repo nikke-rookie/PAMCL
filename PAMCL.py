@@ -110,11 +110,21 @@ class PAMCL(GraphRecommender):
 
                 ccl_loss = 0.
                 # if self.data.image_modal and self.data.text_modal:
-                #     u_loss = self.cl_rate*cl_loss(user_ids, rec_user_emb+image_side_user, rec_user_emb+text_side_user, self.temp, self.device)
-                #     i_loss = self.cl_rate*cl_loss(pos_ids, rec_item_emb+image_embs, rec_item_emb+text_embs, self.temp, self.device)
+                #     u_loss = self.cl_rate*cl_loss(user_ids, image_side_user, text_side_user, self.temp, self.device)
+                #     i_loss = self.cl_rate*cl_loss(pos_ids, image_embs, text_embs, self.temp, self.device)
                 #     ccl_loss = u_loss + i_loss
+                #     u_loss = self.cl_rate * (
+                #         cl_loss(user_ids, rec_user_emb, image_side_user, self.temp, self.device) + \
+                #         cl_loss(user_ids, rec_user_emb, text_side_user, self.temp, self.device)
+                #     )
+                #     i_loss = self.cl_rate * (
+                #         cl_loss(pos_ids, rec_item_emb, image_embs, self.temp, self.device) + \
+                #         cl_loss(pos_ids, rec_item_emb, text_embs, self.temp, self.device)
+                #     )
+                #     ccl_loss += u_loss + i_loss
 
-                # total_cl_loss = ui_cl_loss + image_cl_loss + text_cl_loss
+                total_cl_loss = ui_cl_loss + ccl_loss
+                # total_cl_loss = ccl_loss
                 
                 if image_embs is not None and text_embs is not None:
                     l2_loss = l2_reg_loss(self.reg, [user_emb, pos_item_emb, image_embs[pos_ids], text_embs[pos_ids]], self.device)
@@ -126,7 +136,7 @@ class PAMCL(GraphRecommender):
                 else:
                     l2_loss = l2_reg_loss(self.reg, [user_emb, pos_item_emb], self.device)
 
-                batch_loss = rec_loss1 + l2_loss + ui_cl_loss # type: ignore
+                batch_loss = rec_loss1 + l2_loss + total_cl_loss # type: ignore
             
                 optimizer.zero_grad()
                 batch_loss.backward()
