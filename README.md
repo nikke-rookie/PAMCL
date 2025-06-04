@@ -14,6 +14,10 @@ Use conda/mamba to install the environment (**Recommend**):
 conda env create -f environment.yml
 ```
 
+## Datasets
+
+Download from [google drive](https://drive.google.com/file/d/19h7L42K5m51uD8PxfZNiAWT1SOZEWrja/view?usp=sharing).
+
 ## Pre-trained models
 
 - Vision: [openai/clip-vit-base-patch32](https://huggingface.co/openai/clip-vit-base-patch32)
